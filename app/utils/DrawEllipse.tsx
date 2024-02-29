@@ -1,4 +1,6 @@
+import { selectedObjectType } from "@/store/store";
 import { fabric } from "fabric";
+import uuid4 from "uuid4";
 type EllipseProps = {
   canvas?: fabric.Canvas;
   rx?: number;
@@ -12,12 +14,14 @@ type EllipseProps = {
   scaleY?: number;
   left: number;
   top: number;
+  originX?:string;
+  originY?:string;
 };
 
 export const DrawEllipse = ({
   canvas,
-  rx = 100,
-  ry = 100,
+  rx = 1,
+  ry = 1,
   fill = "#D9D9D9",
   stroke = "#000000",
   strokeWidth = 0,
@@ -26,9 +30,11 @@ export const DrawEllipse = ({
   scaleX = 1,
   scaleY = 1,
   left,
-  top,
-}: EllipseProps) => {
-  const RectangleOrEllipseProperties = {
+  top,originX='left',
+  originY='top',
+}: EllipseProps, objectsHistory: selectedObjectType[] | [],
+setObjectsHistory: (object: selectedObjectType) => void) => {
+  const EllipseProperties = {
     rx: rx,
     ry: ry,
     fill,
@@ -40,12 +46,37 @@ export const DrawEllipse = ({
     scaleY,
     left,
     top,
+    width:rx*2,
+    height:ry*2,originX,originY,
   };
+  class CustomEllipse extends fabric.Ellipse {
+    id?: string;
+    label?: string;
+
+    toObject(propertiesToInclude: string[] = []) {
+      return super.toObject(propertiesToInclude.concat("id", "label"));
+    }
+  }
 
   if (canvas) {
-    const ellipse = new fabric.Ellipse(RectangleOrEllipseProperties);
+    const ellipse = new CustomEllipse(EllipseProperties);
+    // console.log("1",ellipse);
+    const id = "Ellipse-"+uuid4();
+    // console.log("2.1",id);
+    ellipse.id = id;
     canvas.add(ellipse);
-
+    // canvas.setActiveObject(ellipse);
+    // console.log("2",ellipse);
+    setObjectsHistory({
+      key: id,
+      type: "ellipse",
+      value: ellipse,
+    });
+    // console.log("3",objectsHistory);
     canvas.requestRenderAll();
+    return ellipse;
+  } else {
+    return null;
   }
+  
 };

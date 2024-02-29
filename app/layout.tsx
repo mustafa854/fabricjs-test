@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import ComponentHistory from "./components/ComponentHistory/ComponentHistory";
 
 
 export const fontSans = FontSans({
@@ -26,7 +27,7 @@ export default function RootLayout({
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}
-      >
+      ><ComponentHistory />
         {children}
       </body>
     </html>

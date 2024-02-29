@@ -1,16 +1,13 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { fabric } from "fabric";
-import SideNavBar from "./components/SideNav.tsx/SideNavBar";
+import SideNavBar from "./components/SideNav/SideNavBar";
 import useDrawingStatus, { DrawingStatusProps } from "@/store/store";
 import { DrawRectangle } from "./utils/DrawRectangle";
 import { DrawEllipse } from "./utils/DrawEllipse";
 
 export default function Home() {
   const [canvas, setCanvas] = useState<fabric.Canvas>();
-  // const [currentDrawingStatus, setCurrentDrawingStatus] = useState<
-  //   string | null
-  // >(null);
 
   const currentDrawingStatus = useDrawingStatus(
     (state: DrawingStatusProps) => state.currentDrawingStatus
@@ -19,61 +16,17 @@ export default function Home() {
     (state: DrawingStatusProps) => state.setCurrentDrawingStatus
   );
 
-  // useEffect(() => {
-  //   const c = new fabric.Canvas("canvas", {
-  //     height: window.innerHeight,
-  //     width: window.innerWidth,
-  //     backgroundColor: "pink",
-  //   });
-  //   const handleResize = () => {
-  //     c.setHeight(window.innerHeight);
-  //     c.setWidth(window.innerWidth);
-  //   };
-  //   window.addEventListener("resize", handleResize);
-  //   setCanvas(c);
-  //   c.on("mouse:down", (e: any) => {
-  //     console.log(e.pointer.x, e.pointer.y, currentDrawingStatus);
-  //     if (currentDrawingStatus === "rectangle") {
-  //       DrawRectangle({ canvas: c, left: e.pointer.x, top: e.pointer.y });
-  //     }
-  //   });
-  //   return () => {
-  //     c.dispose();
-  //     window.removeEventListener("resize", handleResize);
-  //   };
-  // }, []);
+  const objectsHistory = useDrawingStatus(
+    (state: DrawingStatusProps) => state.objectsHistory
+  );
+  const setObjectsHistory = useDrawingStatus(
+    (state: DrawingStatusProps) => state.setObjectsHistory
+  );
+  
 
-  // useEffect(() => {
-  //   const c = new fabric.Canvas("canvas", {
-  //     height: window.innerHeight,
-  //     width: window.innerWidth,
-  //     backgroundColor: "pink",
-  //   });
-  //   const handleMouseDown = (e: any) => {
-  //     console.log(c);
-  //     console.log(e.pointer.x, e.pointer.y, currentDrawingStatus);
-  //     if (currentDrawingStatus === "rectangle") {
-  //       DrawRectangle({ canvas: c, left: e.pointer.x, top: e.pointer.y });
-  //       setCurrentDrawingStatus(null);
-  //     }
-  //   };
-  //   const handleResize = () => {
-  //     c.setHeight(window.innerHeight);
-  //     c.setWidth(window.innerWidth);
-  //   };
-
-  //   c.on("mouse:down", handleMouseDown); // Add event listener
-
-  //   window.addEventListener("resize", handleResize);
-
-  //   setCanvas(c);
-
-  //   return () => {
-  //     c.off("mouse:down", handleMouseDown); // Remove event listener
-  //     c.dispose();
-  //     window.removeEventListener("resize", handleResize);
-  //   };
-  // }, [currentDrawingStatus]);
+  useEffect(()=>{
+console.log("final",objectsHistory);
+  },[objectsHistory])
 
   useEffect(() => {
     const c = new fabric.Canvas("canvas", {
@@ -95,37 +48,85 @@ export default function Home() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
   useEffect(() => {
     if (!canvas) return;
-
+    
+    let startX: number, startY: number, shape:fabric.Object | null = null;
     const handleMouseDown = (e: any) => {
-      // console.log(c);
-      console.log(e.pointer.x, e.pointer.y, currentDrawingStatus);
+      // // console.log(c);
+      // console.log(e.pointer.x, e.pointer.y, currentDrawingStatus);
+      startX = e.pointer.x;
+      startY = e.pointer.y;
       if (currentDrawingStatus === "rectangle") {
-        console.log(currentDrawingStatus);
-        DrawRectangle({
-          canvas: canvas,
-          left: e.pointer.x,
-          top: e.pointer.y,
-          
-        });
-        setCurrentDrawingStatus(null);
+        // console.log(currentDrawingStatus);
+        shape = DrawRectangle(
+          {
+            canvas: canvas,
+            left: e.pointer.x,
+            top: e.pointer.y,
+          },
+          objectsHistory,
+          setObjectsHistory
+        );
+        
       } else if (currentDrawingStatus === "ellipse") {
-        console.log(currentDrawingStatus);
-        DrawEllipse({
+        // console.log(currentDrawingStatus);
+        shape = DrawEllipse({
           canvas: canvas,
           left: e.pointer.x,
           top: e.pointer.y,
-          
-        });
-        setCurrentDrawingStatus(null);
+        },
+        objectsHistory,
+        setObjectsHistory);
+        
       }
     };
+    
+    const handleMouseMove = (e:any)=>{
+      const pointer = canvas.getPointer(e.e)
+      let originHorizontal = 'left';
+      let originVertical ='top';
+      if(pointer.x - startX < 0){
+       originHorizontal = 'right'
+      }
+      if(pointer.y - startY < 0){
+       originVertical = 'bottom'
+      }
+      const width = Math.abs(pointer.x - startX);
+      const height = Math.abs(pointer.y - startY);
+      if (shape && currentDrawingStatus === "rectangle") {
+        // console.log("!!!!!!!!!!!!!!!!!!!!!");
+        shape.set({ width: width, height: height, originX:originHorizontal, originY:originVertical });
+        canvas.renderAll();
+      }
+      if (shape && currentDrawingStatus === "ellipse"  ) {
+        const rx = width / 2;
+        const ry = height / 2;
+        // console.log(width);
+        // console.log(height);
 
+        const ellipse = shape as fabric.Ellipse;
+        ellipse.set({ rx:  rx, ry: ry, originX:originHorizontal, originY:originVertical });
+        canvas.renderAll();
+      }
+
+      
+    }
+
+    const handleMouseUp = (e:any)=>{
+      setCurrentDrawingStatus(null);
+      return
+      
+    }
     canvas.on("mouse:down", handleMouseDown);
+    canvas.on('mouse:move', handleMouseMove);
+    canvas.on('mouse:up', handleMouseUp);
 
     return () => {
       canvas.off("mouse:down", handleMouseDown);
+      canvas.off('mouse:move', handleMouseMove);
+      canvas.off('mouse:up', handleMouseUp);
     };
   }, [currentDrawingStatus, canvas]);
 

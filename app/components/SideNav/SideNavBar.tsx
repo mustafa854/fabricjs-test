@@ -21,9 +21,9 @@ const SideNavBar = ({
   currentDrawingStatus,
   setCurrentDrawingStatus,
 }: props) => {
-  useEffect(() => {
-    console.log(currentDrawingStatus);
-  }, [currentDrawingStatus]);
+  //   useEffect(() => {
+  //     console.log(currentDrawingStatus);
+  //   }, [currentDrawingStatus]);
 
   return (
     <Menubar>
