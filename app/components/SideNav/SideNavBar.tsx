@@ -11,6 +11,7 @@ import {
 import classNames from "classnames";
 
 import React, { useEffect } from "react";
+import ContextMenuDisable from "../ContextMenu/ContextMenuDisable";
 
 type props = {
   currentDrawingStatus: string | null;
@@ -26,6 +27,7 @@ const SideNavBar = ({
   //   }, [currentDrawingStatus]);
 
   return (
+    <ContextMenuDisable>
     <Menubar>
       <MenubarMenu>
         <MenubarTrigger
@@ -147,7 +149,7 @@ const SideNavBar = ({
           Text
         </MenubarTrigger>
       </MenubarMenu>
-    </Menubar>
+    </Menubar></ContextMenuDisable>
   );
 };
 

@@ -9,6 +9,9 @@
 # testing
 /coverage
 
+
+todo.md
+
 # next.js
 /.next/
 /out/

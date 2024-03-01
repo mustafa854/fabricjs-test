@@ -14,26 +14,30 @@ type EllipseProps = {
   scaleY?: number;
   left: number;
   top: number;
-  originX?:string;
-  originY?:string;
+  originX?: string;
+  originY?: string;
 };
 
-export const DrawEllipse = ({
-  canvas,
-  rx = 1,
-  ry = 1,
-  fill = "#D9D9D9",
-  stroke = "#000000",
-  strokeWidth = 0,
-  opacity = 1,
-  angle = 0,
-  scaleX = 1,
-  scaleY = 1,
-  left,
-  top,originX='left',
-  originY='top',
-}: EllipseProps, objectsHistory: selectedObjectType[] | [],
-setObjectsHistory: (object: selectedObjectType) => void) => {
+export const DrawEllipse = (
+  {
+    canvas,
+    rx = 1,
+    ry = 1,
+    fill = "#D9D9D9",
+    stroke = "#000000",
+    strokeWidth = 0,
+    opacity = 1,
+    angle = 0,
+    scaleX = 1,
+    scaleY = 1,
+    left,
+    top,
+    originX = "left",
+    originY = "top",
+  }: EllipseProps,
+  objectsHistory: selectedObjectType[] | [],
+  setObjectsHistory: (object: selectedObjectType) => void
+) => {
   const EllipseProperties = {
     rx: rx,
     ry: ry,
@@ -46,22 +50,31 @@ setObjectsHistory: (object: selectedObjectType) => void) => {
     scaleY,
     left,
     top,
-    width:rx*2,
-    height:ry*2,originX,originY,
+    width: rx * 2,
+    height: ry * 2,
+    originX,
+    originY,
+    type: "ellipse",
+    cornerSize: 10,
+    cornerStrokeColor: "black",
+    borderColor: "black",
+    cornerColor: "transparent",
+    transparentCorners: false,
   };
   class CustomEllipse extends fabric.Ellipse {
     id?: string;
     label?: string;
+    type?: string;
 
     toObject(propertiesToInclude: string[] = []) {
-      return super.toObject(propertiesToInclude.concat("id", "label"));
+      return super.toObject(propertiesToInclude.concat("id", "label", "type"));
     }
   }
 
   if (canvas) {
     const ellipse = new CustomEllipse(EllipseProperties);
     // console.log("1",ellipse);
-    const id = "Ellipse-"+uuid4();
+    const id = "Ellipse-" + uuid4();
     // console.log("2.1",id);
     ellipse.id = id;
     canvas.add(ellipse);
@@ -78,5 +91,4 @@ setObjectsHistory: (object: selectedObjectType) => void) => {
   } else {
     return null;
   }
-  
 };

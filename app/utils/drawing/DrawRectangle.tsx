@@ -33,8 +33,8 @@ export const DrawRectangle = (
     scaleY = 1,
     left,
     top,
-    originX='left',
-    originY='top',
+    originX = "left",
+    originY = "top",
   }: RectangleProps,
   objectsHistory: selectedObjectType[] | [],
   setObjectsHistory: (object: selectedObjectType) => void
@@ -50,7 +50,14 @@ export const DrawRectangle = (
     scaleX,
     scaleY,
     left,
-    top,originX,originY,
+    top,
+    originX,
+    originY,
+    cornerSize: 10,
+    cornerStrokeColor: "black",
+    borderColor: "black",
+    cornerColor: "transparent",
+    transparentCorners: false,
   };
 
   class CustomRect extends fabric.Rect {
@@ -65,7 +72,7 @@ export const DrawRectangle = (
   if (canvas) {
     const rectangle = new CustomRect(RectangleProperties);
     // console.log("1",rectangle);
-    const id = uuid4();
+    const id = "Rectangle-" + uuid4();
     // console.log("2.1",id);
     rectangle.id = id;
     canvas.add(rectangle);
@@ -81,5 +88,4 @@ export const DrawRectangle = (
   } else {
     return null;
   }
-
 };

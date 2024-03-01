@@ -3,6 +3,7 @@ import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import ComponentHistory from "./components/ComponentHistory/ComponentHistory";
+import ContextMenuDisable from "./components/ContextMenu/ContextMenuDisable";
 
 
 export const fontSans = FontSans({
@@ -27,8 +28,12 @@ export default function RootLayout({
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}
-      ><ComponentHistory />
+      >
+        <ContextMenuDisable >
+        <ComponentHistory />
+        </ContextMenuDisable>
         {children}
+        
       </body>
     </html>
   );

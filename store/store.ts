@@ -7,6 +7,8 @@ export interface selectedObjectType {
 }
 
 export interface DrawingStatusProps {
+  globalCanvas: fabric.Canvas | null;
+  setGlobalCanvas: (canvas: fabric.Canvas | null) => void;
   currentDrawingStatus: string | null;
   setCurrentDrawingStatus: (newStatus: string | null) => void;
   objectsHistory: selectedObjectType[] | [];
@@ -16,6 +18,9 @@ export interface DrawingStatusProps {
 }
 
 const useDrawingStatus = create<DrawingStatusProps>((set) => ({
+  globalCanvas: null,
+  setGlobalCanvas: (canvas: fabric.Canvas | null) => set({ globalCanvas: canvas }),
+
   currentDrawingStatus: null,
   setCurrentDrawingStatus: (newStatus: string | null) =>
     set({ currentDrawingStatus: newStatus }),
@@ -24,8 +29,8 @@ const useDrawingStatus = create<DrawingStatusProps>((set) => ({
   setObjectsHistory: (object: selectedObjectType) =>
     set((state) => ({
       objectsHistory: [
-        ...state.objectsHistory,
-        object,
+        object,...state.objectsHistory,
+        
       ]
     })),
 

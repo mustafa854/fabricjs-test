@@ -74,3 +74,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.tabsTrigger[data-state='active']{
+  font-weight: 700;
+}
+
+
+.remove-arrow::-webkit-inner-spin-button, 
+        .remove-arrow::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        } 
+  
+        .remove-arrow { 
+            -moz-appearance: textfield; 
+        } 
+
+
+.group:focus-within {
+          @apply outline-1;
+          outline-color: blue-500; /* Adjust the color as needed */
+        }

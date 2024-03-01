@@ -1,14 +1,23 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { fabric } from "fabric";
 import SideNavBar from "./components/SideNav/SideNavBar";
 import useDrawingStatus, { DrawingStatusProps } from "@/store/store";
-import { DrawRectangle } from "./utils/DrawRectangle";
-import { DrawEllipse } from "./utils/DrawEllipse";
+import ContextMenuPopup from "./components/ContextMenu/ContextMenuPopup";
+import { ContextMenuPopupLinksCanvas } from "./components/ContextMenu/ContextMenuPopupLinksCanvas";
+import { DrawRectangle } from "./utils/drawing/DrawRectangle";
+import { DrawEllipse } from "./utils/drawing/DrawEllipse";
+import PropertiesSideBar from "./components/PropertiesSideBar/PropertiesSideBar";
+import Loading from "./loading";
 
 export default function Home() {
   const [canvas, setCanvas] = useState<fabric.Canvas>();
-
+  const globalCanvas = useDrawingStatus(
+    (state: DrawingStatusProps) => state.globalCanvas
+  );
+  const setGlobalCanvas = useDrawingStatus(
+    (state: DrawingStatusProps) => state.setGlobalCanvas
+  );
   const currentDrawingStatus = useDrawingStatus(
     (state: DrawingStatusProps) => state.currentDrawingStatus
   );
@@ -22,37 +31,81 @@ export default function Home() {
   const setObjectsHistory = useDrawingStatus(
     (state: DrawingStatusProps) => state.setObjectsHistory
   );
-  
 
-  useEffect(()=>{
-console.log("final",objectsHistory);
-  },[objectsHistory])
-
+  const clickedObject = useDrawingStatus(
+    (state: DrawingStatusProps) => state.clickedObject
+  );
+  const setClickedObject = useDrawingStatus(
+    (state: DrawingStatusProps) => state.setClickedObject
+  );
+  //     useEffect(()=>{
+  //       console.log("clickedObject",clickedObject)
+  //     },[clickedObject])
+  //   useEffect(()=>{
+  // console.log("final",objectsHistory);
+  //   },[objectsHistory])
+  // useEffect(() => {
+  //   console.log("globalCanvas", globalCanvas);
+  // }, [globalCanvas]);
   useEffect(() => {
     const c = new fabric.Canvas("canvas", {
       height: window.innerHeight,
       width: window.innerWidth,
-      backgroundColor: "pink",
+      backgroundColor: "#e5e5e5",
+      selectionBorderColor: "black",
+      selectionColor: "#eae9ee",
     });
 
+    setGlobalCanvas(c);
     const handleResize = () => {
       c.setHeight(window.innerHeight);
       c.setWidth(window.innerWidth);
     };
-
+    c.on("selection:created", (e) => {
+      if (e.selected && e.selected[0]) {
+        const selectedObject = e.selected[0] as fabric.Object & {
+          id: string;
+          type: string;
+        };
+        setClickedObject({
+          key: selectedObject.id,
+          value: selectedObject,
+          type: selectedObject.type,
+        });
+      }
+    });
+    c.on("selection:updated", (e) => {
+      if (e.selected && e.selected[0]) {
+        const selectedObject = e.selected[0] as fabric.Object & {
+          id: string;
+          type: string;
+        };
+        setClickedObject({
+          key: selectedObject.id,
+          value: selectedObject,
+          type: selectedObject.type,
+        });
+      }
+    });
+    c.on("selection:cleared", (e) => {
+      setClickedObject(null);
+    });
     window.addEventListener("resize", handleResize);
     setCanvas(c);
 
     return () => {
+      c.off("selection:created");
+      c.off("selection:created");
       c.dispose();
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
   useEffect(() => {
     if (!canvas) return;
-    
-    let startX: number, startY: number, shape:fabric.Object | null = null;
+
+    let startX: number,
+      startY: number,
+      shape: fabric.Object | null = null;
     const handleMouseDown = (e: any) => {
       // // console.log(c);
       // console.log(e.pointer.x, e.pointer.y, currentDrawingStatus);
@@ -69,64 +122,71 @@ console.log("final",objectsHistory);
           objectsHistory,
           setObjectsHistory
         );
-        
       } else if (currentDrawingStatus === "ellipse") {
         // console.log(currentDrawingStatus);
-        shape = DrawEllipse({
-          canvas: canvas,
-          left: e.pointer.x,
-          top: e.pointer.y,
-        },
-        objectsHistory,
-        setObjectsHistory);
-        
+        shape = DrawEllipse(
+          {
+            canvas: canvas,
+            left: e.pointer.x,
+            top: e.pointer.y,
+          },
+          objectsHistory,
+          setObjectsHistory
+        );
       }
     };
-    
-    const handleMouseMove = (e:any)=>{
-      const pointer = canvas.getPointer(e.e)
-      let originHorizontal = 'left';
-      let originVertical ='top';
-      if(pointer.x - startX < 0){
-       originHorizontal = 'right'
+
+    const handleMouseMove = (e: any) => {
+      const pointer = canvas.getPointer(e.e);
+      let originHorizontal = "left";
+      let originVertical = "top";
+      if (pointer.x - startX < 0) {
+        originHorizontal = "right";
       }
-      if(pointer.y - startY < 0){
-       originVertical = 'bottom'
+      if (pointer.y - startY < 0) {
+        originVertical = "bottom";
       }
       const width = Math.abs(pointer.x - startX);
       const height = Math.abs(pointer.y - startY);
       if (shape && currentDrawingStatus === "rectangle") {
         // console.log("!!!!!!!!!!!!!!!!!!!!!");
-        shape.set({ width: width, height: height, originX:originHorizontal, originY:originVertical });
+        shape.set({
+          width: width,
+          height: height,
+          originX: originHorizontal,
+          originY: originVertical,
+        });
         canvas.renderAll();
       }
-      if (shape && currentDrawingStatus === "ellipse"  ) {
+      if (shape && currentDrawingStatus === "ellipse") {
         const rx = width / 2;
         const ry = height / 2;
         // console.log(width);
         // console.log(height);
 
         const ellipse = shape as fabric.Ellipse;
-        ellipse.set({ rx:  rx, ry: ry, originX:originHorizontal, originY:originVertical });
+        ellipse.set({
+          rx: rx,
+          ry: ry,
+          originX: originHorizontal,
+          originY: originVertical,
+        });
         canvas.renderAll();
       }
+    };
 
-      
-    }
-
-    const handleMouseUp = (e:any)=>{
+    const handleMouseUp = (e: any) => {
       setCurrentDrawingStatus(null);
-      return
-      
-    }
+      return;
+    };
     canvas.on("mouse:down", handleMouseDown);
-    canvas.on('mouse:move', handleMouseMove);
-    canvas.on('mouse:up', handleMouseUp);
+    canvas.on("mouse:move", handleMouseMove);
+    canvas.on("mouse:up", handleMouseUp);
 
     return () => {
       canvas.off("mouse:down", handleMouseDown);
-      canvas.off('mouse:move', handleMouseMove);
-      canvas.off('mouse:up', handleMouseUp);
+      canvas.off("mouse:move", handleMouseMove);
+      canvas.off("mouse:up", handleMouseUp);
     };
   }, [currentDrawingStatus, canvas]);
 
@@ -140,7 +200,10 @@ console.log("final",objectsHistory);
               setCurrentDrawingStatus={setCurrentDrawingStatus}
             />
           </div>
-          <canvas id="canvas" style={{ width: "100vw", height: "100vh" }} />
+          <ContextMenuPopup contextMenuLinks={ContextMenuPopupLinksCanvas}>
+            <canvas id="canvas" style={{ width: "100vw", height: "100vh" }} />
+            <PropertiesSideBar />
+          </ContextMenuPopup>
         </div>
       </main>
     </>
