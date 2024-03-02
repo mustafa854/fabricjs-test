@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import ComponentHistory from "./components/ComponentHistory/ComponentHistory";
 import ContextMenuDisable from "./components/ContextMenu/ContextMenuDisable";
+  
 
 
 export const fontSans = FontSans({
@@ -17,9 +18,9 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode; 
 }>) {
   return (
     <html lang="en">

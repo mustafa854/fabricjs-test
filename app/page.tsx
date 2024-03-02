@@ -55,7 +55,11 @@ export default function Home() {
       selectionBorderColor: "black",
       selectionColor: "#eae9ee",
     });
-
+    fabric.Object.prototype.cornerSize = 10;
+    fabric.Object.prototype.transparentCorners = false;
+    fabric.Object.prototype.cornerColor = 'transparent'; // Change corner color to blue
+    fabric.Object.prototype.cornerStrokeColor = 'black'; // Change corner stroke color to blue
+    fabric.Object.prototype.borderColor = 'black'; // Change border color to blue
     setGlobalCanvas(c);
     const handleResize = () => {
       c.setHeight(window.innerHeight);
@@ -107,6 +111,11 @@ export default function Home() {
       startY: number,
       shape: fabric.Object | null = null;
     const handleMouseDown = (e: any) => {
+      
+      // if (currentDrawingStatus===null && e.target) {
+      //   console.log("ghazipur ka khitta meri pehchaan e", e)
+      //   handleSelection(e);
+      // }
       // // console.log(c);
       // console.log(e.pointer.x, e.pointer.y, currentDrawingStatus);
       startX = e.pointer.x;
@@ -135,7 +144,25 @@ export default function Home() {
         );
       }
     };
-
+    // function handleSelection(e:any) {
+    //   const { target } = e;
+    //   if (!canvas) return;
+    //   if (target) {
+       
+    //     // If the target is already selected, deselect it
+    //     if (target.selected) {
+    //       target.set('borderColor', 'black'); // Change border color back to black
+    //       target.set('cornerColor', 'black'); // Change corner color back to black
+    //       target.set('cornerStrokeColor', 'black'); // Change corner stroke color back to black
+    //     } else {
+    //       target.set('borderColor', 'blue'); // Change border color to blue
+    //       target.set('cornerColor', 'blue'); // Change corner color to blue
+    //       target.set('cornerStrokeColor', 'blue'); // Change corner stroke color to blue
+    //     }
+    //     target.set('selected', !target.selected); // Toggle selected state
+    //     canvas.renderAll();
+    //   }
+    // }
     const handleMouseMove = (e: any) => {
       const pointer = canvas.getPointer(e.e);
       let originHorizontal = "left";
