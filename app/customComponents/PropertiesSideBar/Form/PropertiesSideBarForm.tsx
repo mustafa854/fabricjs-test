@@ -14,11 +14,11 @@ import ColorPickerInput from "./ColorPickerInput";
 import useDrawingStatus from "@/store/store";
 import RenderCanvasProperties from "@/app/utils/propertiesRender/render/RenderCanvasProperties";
 import { changePosition } from "@/app/utils/propertiesRender/rectangle&Ellipse/changePosition";
-import Angle from "../../Icons/Angle";
-import Radius from "../../Icons/Radius";
+import Angle from "@/app/customComponents/Icons/Angle";
+import Radius from "@/app/customComponents/Icons/Radius";
 import RenderRectangleProperties from "@/app/utils/propertiesRender/render/RenderRectangleProperties";
 import RenderEllipseProperties from "@/app/utils/propertiesRender/render/RenderEllipseProperties";
-function useForceUpdate() {
+export function useForceUpdate() {
   const [, setValue] = useState(0); // The state value itself isn't important
 
   return () => setValue((value) => value + 1); // Update the state value to trigger re-render

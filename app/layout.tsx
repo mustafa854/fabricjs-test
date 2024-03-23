@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import ComponentHistory from "./components/ComponentHistory/ComponentHistory";
-import ContextMenuDisable from "./components/ContextMenu/ContextMenuDisable";
+import ComponentHistory from "@/app/customComponents/ComponentHistory/ComponentHistory";
+import ContextMenuDisable from '@/app/customComponents//ContextMenu/ContextMenuDisable';
   
 
 

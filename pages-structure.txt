@@ -1,0 +1,6 @@
+homepage
+forgot password
+signup
+logout
+login
+dashboard-----project-----pages

@@ -1,5 +1,5 @@
-import ColorPickerInput from "@/app/components/PropertiesSideBar/Form/ColorPickerInput";
-import DropdownInput from "@/app/components/PropertiesSideBar/Form/DropdownInput";
+import ColorPickerInput from "@/app/customComponents/PropertiesSideBar/Form/ColorPickerInput";
+import DropdownInput from "@/app/customComponents/PropertiesSideBar/Form/DropdownInput";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import useDrawingStatus from "@/store/store";

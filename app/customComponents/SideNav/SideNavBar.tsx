@@ -10,24 +10,31 @@ import {
 } from "@/components/ui/menubar";
 import classNames from "classnames";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ContextMenuDisable from "../ContextMenu/ContextMenuDisable";
+import ErrorNotification from "../notification/ErrorNotification";
 
 type props = {
   currentDrawingStatus: string | null;
-  setCurrentDrawingStatus: (status: string | null) => void;
+  setCurrentDrawingStatus: (status: string | null) => void;deleteItem: () => void;showError: boolean
+   setShowError: (status: boolean) => void
 };
 
 const SideNavBar = ({
   currentDrawingStatus,
-  setCurrentDrawingStatus,
+  setCurrentDrawingStatus, deleteItem, showError, setShowError
 }: props) => {
   //   useEffect(() => {
   //     console.log(currentDrawingStatus);
   //   }, [currentDrawingStatus]);
+  
+
+  
+
 
   return (
     <ContextMenuDisable>
+      
     <Menubar>
       <MenubarMenu>
         <MenubarTrigger
@@ -148,6 +155,30 @@ const SideNavBar = ({
         >
           Text
         </MenubarTrigger>
+      </MenubarMenu>
+      <MenubarMenu>
+      
+      {currentDrawingStatus === null ? (
+  <MenubarTrigger
+    className={classNames({
+      "bg-accent text-accent-foreground": currentDrawingStatus === "text",
+    })}
+    onClick={() => {
+      setShowError(true);
+    }}
+  >
+    Delete
+  </MenubarTrigger>
+) : (
+  <MenubarTrigger
+    className={classNames({
+      "bg-accent text-accent-foreground": currentDrawingStatus === "text",
+    })}
+    onClick={deleteItem}
+  >
+    Delete
+  </MenubarTrigger>
+)}
       </MenubarMenu>
     </Menubar></ContextMenuDisable>
   );

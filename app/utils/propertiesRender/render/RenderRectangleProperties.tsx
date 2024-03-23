@@ -1,8 +1,8 @@
 "use client";
-import Angle from "@/app/components/Icons/Angle";
-import ColorPickerInput from "@/app/components/PropertiesSideBar/Form/ColorPickerInput";
-import DropdownInput from "@/app/components/PropertiesSideBar/Form/DropdownInput";
-import PositionInput from "@/app/components/PropertiesSideBar/Form/PositionInput";
+import Angle from "@/app/customComponents/Icons/Angle";
+import ColorPickerInput from "@/app/customComponents/PropertiesSideBar/Form/ColorPickerInput";
+import DropdownInput from "@/app/customComponents/PropertiesSideBar/Form/DropdownInput";
+import PositionInput from "@/app/customComponents/PropertiesSideBar/Form/PositionInput";
 import { Button } from "@/components/ui/button";
 import useDrawingStatus, { selectedObjectType } from "@/store/store";
 import { Separator } from "@radix-ui/react-menubar";

@@ -1,16 +1,20 @@
 "use client";
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { fabric } from "fabric";
-import SideNavBar from "./components/SideNav/SideNavBar";
-import useDrawingStatus, { DrawingStatusProps } from "@/store/store";
-import ContextMenuPopup from "./components/ContextMenu/ContextMenuPopup";
-import { ContextMenuPopupLinksCanvas } from "./components/ContextMenu/ContextMenuPopupLinksCanvas";
-import { DrawRectangle } from "./utils/drawing/DrawRectangle";
-import { DrawEllipse } from "./utils/drawing/DrawEllipse";
-import PropertiesSideBar from "./components/PropertiesSideBar/PropertiesSideBar";
+import useDrawingStatus, { DrawingStatusProps, selectedObjectType } from "@/store/store";
 import Loading from "./loading";
+import SideNavBar from '@/app/customComponents//SideNav/SideNavBar';
+import ContextMenuPopup from '@/app/customComponents//ContextMenu/ContextMenuPopup';
+import { ContextMenuPopupLinksCanvas } from '@/app/customComponents//ContextMenu/ContextMenuPopupLinksCanvas';
+import { DrawRectangle } from '@/app/utils/drawing/DrawRectangle';
+import { DrawEllipse } from '@/app/utils/drawing/DrawEllipse';
+import PropertiesSideBar from '@/app/customComponents//PropertiesSideBar/PropertiesSideBar';
+import ErrorNotification from '@/app/customComponents//notification/ErrorNotification';
+import { removeShape } from '@/app/utils/drawing/DeleteShape';
+import { useForceUpdate } from '@/app/customComponents//PropertiesSideBar/Form/PropertiesSideBarForm';
 
 export default function Home() {
+  const forceUpdate = useForceUpdate();
   const [canvas, setCanvas] = useState<fabric.Canvas>();
   const globalCanvas = useDrawingStatus(
     (state: DrawingStatusProps) => state.globalCanvas
@@ -31,7 +35,7 @@ export default function Home() {
   const setObjectsHistory = useDrawingStatus(
     (state: DrawingStatusProps) => state.setObjectsHistory
   );
-
+  const [showError, setShowError] = useState(false);
   const clickedObject = useDrawingStatus(
     (state: DrawingStatusProps) => state.clickedObject
   );
@@ -76,7 +80,7 @@ export default function Home() {
           value: selectedObject,
           type: selectedObject.type,
         });
-      }
+      }forceUpdate()
     });
     c.on("selection:updated", (e) => {
       if (e.selected && e.selected[0]) {
@@ -84,15 +88,17 @@ export default function Home() {
           id: string;
           type: string;
         };
+        setClickedObject(null);
         setClickedObject({
           key: selectedObject.id,
           value: selectedObject,
           type: selectedObject.type,
         });
       }
+      forceUpdate()
     });
     c.on("selection:cleared", (e) => {
-      setClickedObject(null);
+      setClickedObject(null);forceUpdate()
     });
     window.addEventListener("resize", handleResize);
     setCanvas(c);
@@ -216,15 +222,33 @@ export default function Home() {
       canvas.off("mouse:up", handleMouseUp);
     };
   }, [currentDrawingStatus, canvas]);
+  const handleDeleteClick = () => {
+    if (currentDrawingStatus === null) {
+      console.log("if")
+      console.log("currentDrawingStatus", currentDrawingStatus)
+      setShowError(true);setTimeout(()=>setShowError(false), 3000);
+    } else {
+      console.log("else")
+      console.log("currentDrawingStatus", currentDrawingStatus)
+      if(globalCanvas && clickedObject?.value){
 
+        removeShape(clickedObject?.value, globalCanvas)
+        console.log("removed" )
+        
+      }
+      setCurrentDrawingStatus(null);
+    }
+ };
   return (
     <>
       <main className="">
         <div className="relative">
+          {showError && <ErrorNotification />}
           <div className="absolute top-2 mx-auto z-50 left-1/2 transform -translate-x-1/2">
             <SideNavBar
               currentDrawingStatus={currentDrawingStatus}
               setCurrentDrawingStatus={setCurrentDrawingStatus}
+              deleteItem = {handleDeleteClick} showError={showError} setShowError={setShowError}
             />
           </div>
           <ContextMenuPopup contextMenuLinks={ContextMenuPopupLinksCanvas}>
